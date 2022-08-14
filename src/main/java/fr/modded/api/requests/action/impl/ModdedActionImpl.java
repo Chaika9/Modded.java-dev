@@ -27,6 +27,10 @@ public class ModdedActionImpl<T> implements ModdedAction<T> {
         return new ModdedActionImpl<>(modded, route, handler);
     }
 
+    public static <T> ModdedActionImpl<T> onRequestExecute(ModdedImpl modded, Route route, JSONObject data) {
+        return new ModdedActionImpl<>(modded, route, data);
+    }
+
     public ModdedActionImpl(ModdedImpl modded, Route route) {
         this(modded, route, null, null);
     }

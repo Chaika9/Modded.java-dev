@@ -25,13 +25,17 @@ public class UserImpl implements User {
         this.modded = modded;
     }
 
+    public String getSessionToken() {
+        return sessionToken;
+    }
+
     @Override
     public ModdedAction<Server> retrieveServerById(String serverId) {
         return ModdedActionImpl.onRequestExecute(modded, Route.Servers.GET_SERVER,
                 new JSONObject()
                         .put("sessionId", sessionToken)
                         .put("serverId", serverId),
-                (response, request) -> new ServerImpl(response.getObject(), modded));
+                (response, request) -> new ServerImpl(response.getObject(), modded, this));
     }
 
     @Override
