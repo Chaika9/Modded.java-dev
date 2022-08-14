@@ -1,0 +1,111 @@
+import org.apache.tools.ant.filters.ReplaceTokens
+
+plugins {
+    id 'java'
+    id 'java-library'
+    id 'maven-publish'
+    id 'com.github.johnrengelman.shadow' version '7.1.2'
+    id 'idea'
+}
+
+group 'fr.modded'
+
+def versionObject = new Version(major: 1, minor: 0, build: 0)
+version "$versionObject"
+
+repositories {
+    mavenCentral()
+    mavenLocal()
+}
+
+dependencies {
+    compileOnly 'org.projectlombok:lombok:1.18.24'
+    annotationProcessor 'org.projectlombok:lombok:1.18.24'
+
+    implementation 'com.squareup.okhttp3:okhttp:3.13.0'
+    implementation 'org.json:json:20160810'
+}
+
+task sourcesForRelease(type: Copy) {
+    from('src/main/java') {
+        include '**/ModdedConstants.java'
+        filter(ReplaceTokens, tokens: [
+                MAJOR: versionObject.major,
+                MINOR: versionObject.minor,
+                BUILD: versionObject.build
+        ])
+    }
+    into 'build/filteredSrc'
+    includeEmptyDirs = false
+}
+
+task generateJavaSources(type: SourceTask) {
+    def javaSources = sourceSets.main.java.filter {
+        it.name != 'ModdedConstants.java'
+    }
+    source = javaSources + sourcesForRelease.destinationDir
+    dependsOn sourcesForRelease
+}
+
+shadowJar.archiveClassifier.set('withDependencies')
+
+task sourcesJar(type: Jar) {
+    archiveClassifier.set('sources')
+    from('src/main/java') {
+        exclude '**/ModdedConstants.java'
+    }
+    from sourcesForRelease.destinationDir
+    dependsOn sourcesForRelease
+}
+
+build {
+    dependsOn jar
+    dependsOn sourcesJar
+    dependsOn shadowJar
+
+    jar.mustRunAfter clean
+    shadowJar.mustRunAfter sourcesJar
+}
+
+compileJava {
+    source = generateJavaSources.source
+    dependsOn generateJavaSources
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+    options.incremental = true
+    options.compilerArgs += ["-Xlint:deprecation", "-Xlint:unchecked"]
+}
+
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+
+            pom {
+                groupId = project.group
+                version = project.version
+                artifactId = 'modded-java'
+                name = project.name
+
+                developers {
+                    developer {
+                        id = 'chaika9'
+                        name = 'Chaika9'
+                        email = 'chaika9.dev@gmail.com'
+                    }
+                }
+            }
+        }
+    }
+}
+
+class Version {
+    String major, minor, build
+
+    String toString() {
+        return "$major.${minor}_$build"
+    }
+}
