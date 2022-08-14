@@ -60,13 +60,17 @@ public class ServerImpl implements Server {
     @Override
     public ModdedAction<Void> stop() {
         return ModdedActionImpl.onRequestExecute(modded, Route.Servers.STOP_SERVER,
-                new JSONObject().put("sessionId", user.getSessionToken()).put("serverId", id));
+                new JSONObject()
+                        .put("sessionId", user.getSessionToken())
+                        .put("serverId", id));
     }
 
     @Override
     public ModdedAction<Void> reset() {
         return ModdedActionImpl.onRequestExecute(modded, Route.Servers.RESET_SERVER,
-                new JSONObject().put("sessionId", user.getSessionToken()).put("serverId", id));
+                new JSONObject()
+                        .put("sessionId", user.getSessionToken())
+                        .put("serverId", id));
     }
 
     private void unserialize(JSONObject json) {

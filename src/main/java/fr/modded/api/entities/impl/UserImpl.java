@@ -31,6 +31,12 @@ public class UserImpl implements User {
 
     @Override
     public ModdedAction<Server> retrieveServerById(String serverId) {
+        if (serverId == null) {
+            throw new IllegalArgumentException("ServerId cannot be null");
+        }
+        if (serverId.isEmpty()) {
+            throw new IllegalArgumentException("ServerId cannot be empty");
+        }
         return ModdedActionImpl.onRequestExecute(modded, Route.Servers.GET_SERVER,
                 new JSONObject()
                         .put("sessionId", sessionToken)

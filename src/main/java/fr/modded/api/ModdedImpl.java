@@ -50,7 +50,13 @@ public class ModdedImpl implements Modded {
     }
 
     @Override
-    public ModdedAction<String> authenticate(String username) {
+    public ModdedAction<String> minecraftAuthenticate(String username) {
+        if (username == null) {
+            throw new IllegalArgumentException("Username cannot be null");
+        }
+        if (username.isEmpty()) {
+            throw new IllegalArgumentException("Username cannot be empty");
+        }
         return null;
     }
 }
