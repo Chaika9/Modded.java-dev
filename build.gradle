@@ -1,7 +1,6 @@
 import org.apache.tools.ant.filters.ReplaceTokens
 
 plugins {
-    id 'java'
     id 'java-library'
     id 'maven-publish'
     id 'com.github.johnrengelman.shadow' version '7.1.2'
@@ -22,8 +21,8 @@ dependencies {
     compileOnly 'org.projectlombok:lombok:1.18.24'
     annotationProcessor 'org.projectlombok:lombok:1.18.24'
 
-    implementation 'com.squareup.okhttp3:okhttp:3.13.0'
-    implementation 'org.json:json:20160810'
+    implementation 'com.squareup.okhttp3:okhttp:4.10.0'
+    implementation 'org.json:json:20220320'
 }
 
 task sourcesForRelease(type: Copy) {
@@ -82,14 +81,22 @@ tasks.withType(JavaCompile) {
 publishing {
     publications {
         mavenJava(MavenPublication) {
+            version = project.version
+            artifactId = 'modded-java'
+            groupId = project.group
+
             from components.java
 
             pom {
-                groupId = project.group
-                version = project.version
-                artifactId = 'modded-java'
                 name = project.name
-
+                description = 'Java wrapper for Modded API'
+                url = 'https://github.com/Paladium-Developpement/Modded.java'
+                licenses {
+                    license {
+                        name = 'The Apache Software License, Version 2.0'
+                        url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    }
+                }
                 developers {
                     developer {
                         id = 'chaika9'
